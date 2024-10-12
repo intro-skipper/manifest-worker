@@ -7,7 +7,7 @@ interface Env {
 const app = new Hono<{ Bindings: Env }>()
 
 // Utility function to fetch version-specific JSON from KV
-const getVersionDataFromKV = async (version :string, env: Env) => {
+async function getVersionDataFromKV(version: string, env: Env): Promise<Object | null> {
   // Retrieve the version-specific JSON from KV using c.env.<KV_BINDING_NAME>
   const versions = await env.INTRO_SKIPPER_JSON.get(version, { type: 'json' });
 
@@ -17,7 +17,7 @@ const getVersionDataFromKV = async (version :string, env: Env) => {
   }
 
   return versions;
-};
+}
 
 // Route to handle requests based on User-Agent
 app.get('/', async (c) => {
@@ -26,7 +26,7 @@ app.get('/', async (c) => {
   if (userAgent?.startsWith('Jellyfin-Server/')) {
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
     const versions = await getVersionDataFromKV(version, c.env);
-    return c.json([versions]);
+    return c.json(versions);
   }
 
   // Default response for non-matching User-Agent
@@ -40,7 +40,7 @@ app.get('/manifest.json', async (c) => {
   if (userAgent?.startsWith('Jellyfin-Server/')) {
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
     const versions = await getVersionDataFromKV(version, c.env);
-    return c.json([versions]);
+    return c.json(versions);
   }
 
   // Default response for non-matching User-Agent
@@ -51,7 +51,7 @@ app.get('/manifest.json', async (c) => {
 app.get('/:version/manifest.json', async (c) => {
   const version = c.req.param('version').split('.').slice(0, 2).join('.');
   const versions = await getVersionDataFromKV(version, c.env);
-  return c.json([versions]);
+  return c.json(versions);
 });
 
 // Export the Hono app as the default handler
