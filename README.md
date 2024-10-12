@@ -9,7 +9,7 @@ To prevent this, we have created a worker that reads the Jellyfin version from t
 https://manifest.intro-skipper.workers.dev/
 ```
 
-## Developemnt
+## Development
 
 ```
 npm install
