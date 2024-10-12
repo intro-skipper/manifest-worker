@@ -41,7 +41,7 @@ app.get('/', async (c) => {
 
     // Combine common data with the version-specific data
     const responseJson = { ...commonJson, versions };
-    return c.json(responseJson);
+    return c.json([responseJson]);
   }
 
   // Default response for non-matching User-Agent
@@ -55,7 +55,7 @@ app.get('/:version/manifest.json', async (c) => {
 
   // Combine common data with the version-specific data
   const responseJson = { ...commonJson, versions };
-  return c.json(responseJson);
+  return c.json([responseJson]);
 });
 
 // Export the Hono app as the default handler
