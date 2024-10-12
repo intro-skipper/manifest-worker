@@ -1,0 +1,7 @@
+name = "manifest"
+main = "src/index.ts"
+compatibility_date = "2024-10-12"
+compatibility_flags = [ "nodejs_compat" ]
+account_id = "c774cc0e6926f8bafd6bf80498254e91"
+workers_dev = true
+send_metrics = false
