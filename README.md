@@ -9,17 +9,6 @@ To prevent this, we have created a worker that reads the Jellyfin version from t
 https://manifest.intro-skipper.workers.dev/
 ```
 
-## Get a specific version of the manifest
-
-### 10.9
-```
-https://manifest.intro-skipper.workers.dev/10.9/manifest.json
-```
-### 10.8
-```
-https://manifest.intro-skipper.workers.dev/10.8/manifest.json
-```
-
 ## Developemnt
 
 ```
