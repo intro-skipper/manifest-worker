@@ -1,34 +1,22 @@
 import { Hono } from 'hono';
 
-import json1010 from './10.10.json';
-import json109 from './10.9.json';
-import json108 from './10.8.json';
+interface Env {
+  INTRO_SKIPPER_JSON: KVNamespace
+}
 
-// Common metadata (static data stored in the worker)
-const commonJson = {
-  "guid": "c83d86bb-a1e0-4c35-a113-e2101cf4ee6b",
-  "name": "Intro Skipper",
-  "overview": "Automatically detect and skip intros in television episodes",
-  "description": "Analyzes the audio of television episodes and detects introduction sequences.",
-  "owner": "AbandonedCart, rlauuzo, jumoog (forked from ConfusedPolarBear)",
-  "category": "General",
-  "imageUrl": "https://raw.githubusercontent.com/jumoog/intro-skipper/master/images/logo.png"
-};
+const app = new Hono<{ Bindings: Env }>()
 
-const app = new Hono();
+// Utility function to fetch version-specific JSON from KV
+const getVersionDataFromKV = async (version :string, env: Env) => {
+  // Retrieve the version-specific JSON from KV using c.env.<KV_BINDING_NAME>
+  const versions = await env.INTRO_SKIPPER_JSON.get(version, { type: 'json' });
 
-// Utility function to get version-specific JSON data
-const getVersionData = (majorMinorVersion: string) => {
-  switch (majorMinorVersion) {
-    case '10.10':
-      return json1010;
-    case '10.9':
-      return json109;
-    case '10.8':
-      return json108;
-    default:
-      return json1010; // Default fallback to 10.10.json
+  // Fallback to '10.10' JSON if version is not found
+  if (!versions) {
+    return await env.INTRO_SKIPPER_JSON.get('10.10', { type: 'json' });
   }
+
+  return versions;
 };
 
 // Route to handle requests based on User-Agent
@@ -37,11 +25,8 @@ app.get('/', async (c) => {
 
   if (userAgent?.startsWith('Jellyfin-Server/')) {
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
-    const versions = getVersionData(version);
-
-    // Combine common data with the version-specific data
-    const responseJson = { ...commonJson, versions };
-    return c.json([responseJson]);
+    const versions = await getVersionDataFromKV(version, c.env);
+    return c.json([versions]);
   }
 
   // Default response for non-matching User-Agent
@@ -54,11 +39,8 @@ app.get('/manifest.json', async (c) => {
 
   if (userAgent?.startsWith('Jellyfin-Server/')) {
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
-    const versions = getVersionData(version);
-
-    // Combine common data with the version-specific data
-    const responseJson = { ...commonJson, versions };
-    return c.json([responseJson]);
+    const versions = await getVersionDataFromKV(version, c.env);
+    return c.json([versions]);
   }
 
   // Default response for non-matching User-Agent
@@ -68,11 +50,8 @@ app.get('/manifest.json', async (c) => {
 // Route to handle direct versioned manifest.json requests
 app.get('/:version/manifest.json', async (c) => {
   const version = c.req.param('version').split('.').slice(0, 2).join('.');
-  const versions = getVersionData(version);
-
-  // Combine common data with the version-specific data
-  const responseJson = { ...commonJson, versions };
-  return c.json([responseJson]);
+  const versions = await getVersionDataFromKV(version, c.env);
+  return c.json([versions]);
 });
 
 // Export the Hono app as the default handler
