@@ -17,88 +17,45 @@ const commonJson = {
 
 const app = new Hono();
 
+// Utility function to get version-specific JSON data
+const getVersionData = (majorMinorVersion: string) => {
+  switch (majorMinorVersion) {
+    case '10.10':
+      return json1010;
+    case '10.9':
+      return json109;
+    case '10.8':
+      return json108;
+    default:
+      return json1010; // Default fallback to 10.10.json
+  }
+};
+
+// Route to handle requests based on User-Agent
 app.get('/', async (c) => {
-  // Get the User-Agent header
   const userAgent = c.req.header('User-Agent');
 
-  // Check if the User-Agent starts with "Jellyfin-Server/"
-  if (userAgent && userAgent.startsWith('Jellyfin-Server/')) {
-    // Extract the version part (e.g., "10.9.3")
-    const version = userAgent.split('/')[1];
-
-    // Split the version by "." and keep only the major and minor parts (e.g., "10.9")
-    const versionParts = version.split('.');
-    if (versionParts.length >= 2) {
-      const majorMinorVersion = versionParts[0] + '.' + versionParts[1];
-      try {
-        let versions;
-        switch (version) {
-          case '10.10':
-            versions = json1010;  // Serve 10.10.json
-            break;
-          case '10.9':
-            versions = json109;   // Serve 10.9.json
-            break;
-          case '10.8':
-            versions = json108;   // Serve 10.8.json
-            break;
-          default:
-            versions = json1010;  // Serve 10.10.json
-            break;
-        }
-
-        // Combine common data with the version-specific data
-        const responseJson = {
-          ...commonJson,            // Include the common metadata
-          versions     // Add the version-specific data
-        };
-
-        // Return the combined JSON response
-        return c.json(responseJson);
-      } catch (err) {
-        // If version not found or error in loading, return 404
-        return c.json({ error: 'Version not found' }, 404);
-      }
-    }
-  }
-
-  // Default response if User-Agent is invalid or doesn't match
-  return c.redirect('https://github.com/intro-skipper/intro-skipper')
-});
-
-app.get('/:version/manifest.json', async (c) => {
-  // Extract version from the URL
-  const version = c.req.param('version');
-  try {
-    let versions;
-    switch (version) {
-      case '10.10':
-        versions = json1010;  // Serve 10.10.json
-        break;
-      case '10.9':
-        versions = json109;   // Serve 10.9.json
-        break;
-      case '10.8':
-        versions = json108;   // Serve 10.8.json
-        break;
-      default:
-        versions = json1010;  // Serve 10.10.json
-        break;
-    }
+  if (userAgent?.startsWith('Jellyfin-Server/')) {
+    const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
+    const versions = getVersionData(version);
 
     // Combine common data with the version-specific data
-    const responseJson = {
-      ...commonJson,            // Include the common metadata
-      versions     // Add the version-specific data
-    };
-
-    // Return the combined JSON response
+    const responseJson = { ...commonJson, versions };
     return c.json(responseJson);
-
-  } catch (err) {
-    // If version not found or error in loading, return 404
-    return c.json({ error: 'Version not found' }, 404);
   }
+
+  // Default response for non-matching User-Agent
+  return c.redirect('https://github.com/intro-skipper/intro-skipper');
+});
+
+// Route to handle direct versioned manifest.json requests
+app.get('/:version/manifest.json', async (c) => {
+  const version = c.req.param('version').split('.').slice(0, 2).join('.');
+  const versions = getVersionData(version);
+
+  // Combine common data with the version-specific data
+  const responseJson = { ...commonJson, versions };
+  return c.json(responseJson);
 });
 
 // Export the Hono app as the default handler
