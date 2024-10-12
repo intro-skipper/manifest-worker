@@ -6,7 +6,7 @@ To prevent this, we have created a worker that reads the Jellyfin version from t
 ## Use it in Jellyfin
 
 ```
-https://manifest.intro-skipper.workers.dev/
+https://manifest.intro-skipper.workers.dev/manifest.json
 ```
 
 ## Development

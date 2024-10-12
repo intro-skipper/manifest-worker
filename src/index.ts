@@ -48,6 +48,23 @@ app.get('/', async (c) => {
   return c.redirect('https://github.com/intro-skipper/intro-skipper');
 });
 
+// Route to handle requests based on User-Agent
+app.get('/manifest.json', async (c) => {
+  const userAgent = c.req.header('User-Agent');
+
+  if (userAgent?.startsWith('Jellyfin-Server/')) {
+    const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
+    const versions = getVersionData(version);
+
+    // Combine common data with the version-specific data
+    const responseJson = { ...commonJson, versions };
+    return c.json([responseJson]);
+  }
+
+  // Default response for non-matching User-Agent
+  return c.redirect('https://github.com/intro-skipper/intro-skipper');
+});
+
 // Route to handle direct versioned manifest.json requests
 app.get('/:version/manifest.json', async (c) => {
   const version = c.req.param('version').split('.').slice(0, 2).join('.');
