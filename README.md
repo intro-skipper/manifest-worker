@@ -5,7 +5,7 @@ Jellyfin currently has no way to limit the maximum ABI version. This means that 
 ## Use it in Jellyfin
 
 ```
-https://manifest.intro-skipper.workers.dev/manifest.json
+https://manifest.intro-skipper.org/manifest.json
 ```
 
 ## Development
