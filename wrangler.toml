@@ -11,6 +11,10 @@ kv_namespaces = [
   { binding = "INTRO_SKIPPER_JSON", id = "61215c51799a4de59f0a33a8b7aecb0e", preview_id="49c07e5b68074443b940de893d58a997" }
 ]
 
+routes = [
+  { pattern = "manifest.intro-skipper.org", custom_domain = true }
+]
+
 [observability]
 enabled = true
 head_sampling_rate = 1
