@@ -41,10 +41,5 @@ app.get('/:version/manifest.json', async (c) => {
   return c.json(versions);
 });
 
-// redirect everything else to GitHub
-app.all('*', (c) => {
-  return c.redirect('https://github.com/intro-skipper/intro-skipper');
-});
-
 // Export the Hono app as the default handler
 export default app;

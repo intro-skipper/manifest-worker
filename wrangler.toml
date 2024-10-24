@@ -12,7 +12,8 @@ kv_namespaces = [
 ]
 
 routes = [
-  { pattern = "manifest.intro-skipper.org", custom_domain = true }
+  { pattern = "manifest.intro-skipper.org", custom_domain = true },
+  { pattern = "intro-skipper.org", custom_domain = true }
 ]
 
 [observability]
