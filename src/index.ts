@@ -22,8 +22,8 @@ async function getVersionDataFromKV(version: string, env: Env): Promise<Object |
 // Route to handle requests based on User-Agent
 app.get('/', async (c) => {
   const userAgent = c.req.header('User-Agent');
-
   if (userAgent?.startsWith('Jellyfin-Server/')) {
+    console.log({userAgent});
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
     const versions = await getVersionDataFromKV(version, c.env);
     return c.json(versions);
@@ -36,8 +36,8 @@ app.get('/', async (c) => {
 // Route to handle requests based on User-Agent
 app.get('/manifest.json', async (c) => {
   const userAgent = c.req.header('User-Agent');
-
   if (userAgent?.startsWith('Jellyfin-Server/')) {
+    console.log({userAgent});
     const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
     const versions = await getVersionDataFromKV(version, c.env);
     return c.json(versions);
@@ -50,6 +50,7 @@ app.get('/manifest.json', async (c) => {
 // Route to handle direct versioned manifest.json requests
 app.get('/:version/manifest.json', async (c) => {
   const version = c.req.param('version').split('.').slice(0, 2).join('.');
+  console.log({version});
   const versions = await getVersionDataFromKV(version, c.env);
   return c.json(versions);
 });
