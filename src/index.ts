@@ -20,20 +20,6 @@ async function getVersionDataFromKV(version: string, env: Env): Promise<Object |
 }
 
 // Route to handle requests based on User-Agent
-app.get('/', async (c) => {
-  const userAgent = c.req.header('User-Agent');
-  if (userAgent?.startsWith('Jellyfin-Server/')) {
-    console.log({userAgent});
-    const version = userAgent.split('/')[1]?.split('.').slice(0, 2).join('.');
-    const versions = await getVersionDataFromKV(version, c.env);
-    return c.json(versions);
-  }
-
-  // Default response for non-matching User-Agent
-  return c.redirect('https://github.com/intro-skipper/intro-skipper');
-});
-
-// Route to handle requests based on User-Agent
 app.get('/manifest.json', async (c) => {
   const userAgent = c.req.header('User-Agent');
   if (userAgent?.startsWith('Jellyfin-Server/')) {
@@ -53,6 +39,11 @@ app.get('/:version/manifest.json', async (c) => {
   console.log({version});
   const versions = await getVersionDataFromKV(version, c.env);
   return c.json(versions);
+});
+
+// redirect everything else to GitHub
+app.all('*', (c) => {
+  return c.redirect('https://github.com/intro-skipper/intro-skipper');
 });
 
 // Export the Hono app as the default handler
