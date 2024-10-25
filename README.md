@@ -1,20 +1,20 @@
-# Intro Skipper Manifest Worker
+# Why?
 
-Jellyfin currently has no way to limit the maximum ABI version. This means that people can install incompatible versions of a plugin. Unfortunately, the error is only visible after restarting Jellyfin. The average user expects to be offered only working and compatible versions. To prevent this, we have created a worker that reads the Jellyfin version from the `User-Agent` header when a request is made to the worker and returns the correct version.
+Jellyfin currently has no way to limit the maximum ABI version. This means that people can install incompatible versions of a plugin. Unfortunately, the error is only visible after restarting Jellyfin. The average user expects to be offered only working and compatible versions.
 
-## Use it in Jellyfin
+## Cloudflare Domain Redirect Rules
 
-```
-https://manifest.intro-skipper.org/manifest.json
-```
+> [!TIP]
+> Instead of Cloudflare workers, a better, more cost-effective way
 
-## Development
+Instead of using cloudflare workers, we connected a domain to cloudflare and used domain redirect rules.
 
-```
-npm install
-npm run dev
-```
+Rules -> Redirect Rules
 
-```
-npm run deploy
-```
+All rules are `Custom filter expressions`
+
+| **Field**  | **Operator**    | **Value**               | **URL redirect Type** | **URL**                                                                                      | Status code |
+|------------|-----------------|-------------------------|-----------------------|----------------------------------------------------------------------------------------------|-------------|
+| User Agent | strict wildcard | Jellyfin-Server/10.10.* | Static                | <https://raw.githubusercontent.com/intro-skipper/intro-skipper/refs/heads/10.10/manifest.json> | 302         |
+| User Agent | strict wildcard | Jellyfin-Server/10.9.*  | Static                | <https://raw.githubusercontent.com/intro-skipper/intro-skipper/refs/heads/10.9/manifest.json>  | 302         |
+| User Agent | strict wildcard | Jellyfin-Server/10.8.*  | Static                | <https://raw.githubusercontent.com/intro-skipper/intro-skipper/refs/heads/10.8/manifest.json>  | 302         |
